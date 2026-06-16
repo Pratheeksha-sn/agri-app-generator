@@ -8,125 +8,53 @@ function detectAppType(prompt) {
   if (p.includes('weather') || p.includes('season') || p.includes('rainfall') || p.includes('climate') || p.includes('advisory')) return 'weather';
   if (p.includes('soil') || p.includes('ph') || p.includes('organic') || p.includes('moisture')) return 'soil';
   if (p.includes('fertilizer') || p.includes('manure') || p.includes('urea') || p.includes('dap')) return 'fertilizer';
-  if (p.includes('irrigation') || p.includes('water') || p.includes('scheduling')) return 'irrigation';
+  if (p.includes('irrigation') || p.includes('water scheduling')) return 'irrigation';
   return 'general';
 }
 
-function getAppPrompt(type, prompt) {
-  if (type === 'crop') {
-    return `Build a crop recommendation web app for Indian farmers.
-Use three number inputs with ids: nitrogen, phosphorus, potassium.
-Add a button that on click does this using XMLHttpRequest:
-1. Sets result div to "Analyzing your soil..."
-2. POSTs to https://agri-app-generator.vercel.app/api/recommend with JSON: nitrogen, phosphorus, potassium values
-3. On response shows soil_assessment, then loops best_matches showing crop name, suitability, reason in green cards, then close_matches in yellow cards
-All in a div with id="result".
-Use green theme. Output only raw HTML with CSS in style tag and JS in script tag.`;
-  }
+function getCropApp() {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Crop Recommendation</title><style>body{font-family:Arial,sans-serif;background:#f0f7f0;margin:0;padding:20px}.container{max-width:480px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.1)}h2{color:#2d6a4f;text-align:center}label{display:block;font-weight:bold;color:#1b4332;margin-top:12px;margin-bottom:4px}input{width:100%;padding:10px;border:1px solid #b7e4c7;border-radius:8px;font-size:15px;box-sizing:border-box}button{width:100%;margin-top:16px;padding:12px;background:#2d6a4f;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer}button:hover{background:#1b4332}#result{margin-top:20px}.card-green{background:#d8f3dc;padding:12px;margin:8px 0;border-radius:8px;border-left:4px solid #52b788}.card-yellow{background:#fff3cd;padding:12px;margin:8px 0;border-radius:8px;border-left:4px solid #ffc107}</style></head><body><div class="container"><h2>🌾 Crop Recommendation App</h2><label>Nitrogen (N) kg/ha</label><input type="number" id="nitrogen" placeholder="e.g. 80"><label>Phosphorus (P) kg/ha</label><input type="number" id="phosphorus" placeholder="e.g. 40"><label>Potassium (K) kg/ha</label><input type="number" id="potassium" placeholder="e.g. 35"><button onclick="getRecommendation()">Get Crop Recommendation</button><div id="result"></div></div><script>function getRecommendation(){var n=document.getElementById('nitrogen').value;var p=document.getElementById('phosphorus').value;var k=document.getElementById('potassium').value;if(!n||!p||!k){document.getElementById('result').innerHTML='<p style="color:red">Please enter all values!</p>';return;}document.getElementById('result').innerHTML='<p style="color:#2d6a4f">🔍 Analyzing your soil...</p>';var xhr=new XMLHttpRequest();xhr.open('POST','https://agri-app-generator.vercel.app/api/recommend',true);xhr.setRequestHeader('Content-Type','application/json');xhr.onreadystatechange=function(){if(xhr.readyState===4){if(xhr.status===200){var data=JSON.parse(xhr.responseText);var html='<p><b>🌍 Soil Assessment:</b> '+data.soil_assessment+'</p>';html+='<h3 style="color:#2d6a4f">✅ Best Crops:</h3>';data.best_matches.forEach(function(c){html+='<div class="card-green"><b>'+c.crop+'</b> — '+c.suitability+'<br><small>'+c.reason+'</small></div>';});if(data.close_matches&&data.close_matches.length>0){html+='<h3 style="color:#b5500f">⚠️ Close Matches:</h3>';data.close_matches.forEach(function(c){html+='<div class="card-yellow"><b>'+c.crop+'</b> — '+c.suitability+'<br><small>'+c.reason+'</small></div>';});}document.getElementById('result').innerHTML=html;}else{document.getElementById('result').innerHTML='<p style="color:red">Error. Try again.</p>';}}};xhr.send(JSON.stringify({nitrogen:n,phosphorus:p,potassium:k}));}</script></body></html>`;
+}
 
-  if (type === 'weather') {
-    return `Build a weather-based farming advisory app for Indian farmers.
-Use these inputs:
-- Location (text, Indian district name)
-- Season (dropdown: Kharif, Rabi, Summer)
-- Crop Type (dropdown: Paddy, Maize, Wheat, Cotton, Groundnut, Sugarcane, Soybean)
-- Crop Stage (dropdown: Sowing, Vegetative, Flowering, Harvesting)
+function getWeatherApp() {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Weather Farming Advisory</title><style>body{font-family:Arial,sans-serif;background:#f0f7f0;margin:0;padding:20px}.container{max-width:500px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.1)}h2{color:#2d6a4f;text-align:center}label{display:block;font-weight:bold;color:#1b4332;margin-top:12px;margin-bottom:4px}input,select{width:100%;padding:10px;border:1px solid #b7e4c7;border-radius:8px;font-size:15px;box-sizing:border-box}button{width:100%;margin-top:16px;padding:12px;background:#2d6a4f;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer}#result{margin-top:20px}.section{background:#d8f3dc;padding:12px;margin:10px 0;border-radius:8px;border-left:4px solid #52b788}.alert-high{background:#ffd6d6;border-left:4px solid #e63946;padding:12px;border-radius:8px;margin:10px 0}.alert-low{background:#d8f3dc;border-left:4px solid #52b788;padding:12px;border-radius:8px;margin:10px 0}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}th{background:#2d6a4f;color:white;padding:8px}td{padding:8px;border-bottom:1px solid #b7e4c7;text-align:center}</style></head><body><div class="container"><h2>🌦️ Weather Farming Advisory</h2><label>District / Location</label><input type="text" id="location" placeholder="e.g. Mysore, Bellary"><label>Season</label><select id="season"><option value="Kharif">Kharif (Jun–Oct)</option><option value="Rabi">Rabi (Nov–Mar)</option><option value="Summer">Summer (Mar–Jun)</option></select><label>Crop Type</label><select id="crop"><option value="Paddy">Paddy</option><option value="Maize">Maize</option><option value="Wheat">Wheat</option><option value="Cotton">Cotton</option><option value="Groundnut">Groundnut</option><option value="Sugarcane">Sugarcane</option><option value="Soybean">Soybean</option></select><label>Crop Stage</label><select id="stage"><option value="Sowing">Sowing</option><option value="Vegetative">Vegetative</option><option value="Flowering">Flowering</option><option value="Harvesting">Harvesting</option></select><button onclick="getAdvisory()">Get Advisory</button><div id="result"></div></div><script>var weatherData={Kharif:{temp:"28-35°C",humidity:"70-90%",rain:"High (800-1200mm)",forecast:[{day:"Mon",condition:"☁️ Cloudy",rain:"60%"},{day:"Tue",condition:"🌧️ Rain",rain:"80%"},{day:"Wed",condition:"🌧️ Heavy Rain",rain:"90%"},{day:"Thu",condition:"⛅ Partly Cloudy",rain:"40%"},{day:"Fri",condition:"🌤️ Sunny",rain:"20%"},{day:"Sat",condition:"☁️ Cloudy",rain:"50%"},{day:"Sun",condition:"🌧️ Rain",rain:"70%"}]},Rabi:{temp:"15-25°C",humidity:"40-60%",rain:"Low (200-400mm)",forecast:[{day:"Mon",condition:"🌤️ Sunny",rain:"10%"},{day:"Tue",condition:"🌤️ Sunny",rain:"10%"},{day:"Wed",condition:"⛅ Partly Cloudy",rain:"20%"},{day:"Thu",condition:"🌤️ Sunny",rain:"10%"},{day:"Fri",condition:"⛅ Partly Cloudy",rain:"25%"},{day:"Sat",condition:"☁️ Cloudy",rain:"30%"},{day:"Sun",condition:"🌤️ Sunny",rain:"10%"}]},Summer:{temp:"35-42°C",humidity:"20-40%",rain:"Very Low (50-150mm)",forecast:[{day:"Mon",condition:"☀️ Hot",rain:"5%"},{day:"Tue",condition:"☀️ Hot",rain:"5%"},{day:"Wed",condition:"☀️ Very Hot",rain:"5%"},{day:"Thu",condition:"⛅ Partly Cloudy",rain:"15%"},{day:"Fri",condition:"☀️ Hot",rain:"5%"},{day:"Sat",condition:"☀️ Hot",rain:"5%"},{day:"Sun",condition:"⛅ Partly Cloudy",rain:"10%"}]}};var tips={Sowing:{Kharif:["✅ Good time to sow — soil moisture is adequate","⚠️ Ensure proper drainage before sowing","🌱 Treat seeds with fungicide before planting"],Rabi:["✅ Ideal sowing window — cool temperatures help germination","💧 Irrigate immediately after sowing","🌱 Use certified seeds for better yield"],Summer:["⚠️ Avoid sowing in peak heat","💧 Pre-sow irrigation is essential","🌱 Use drought-resistant varieties"]},Vegetative:{Kharif:["⚠️ High humidity may increase fungal risk — apply fungicide","🌿 Apply nitrogen fertilizer for leaf growth","💧 No irrigation needed — rain is sufficient"],Rabi:["🌿 Apply second dose of nitrogen fertilizer","💧 Irrigate every 10-12 days","⚠️ Watch for aphids in dry weather"],Summer:["💧 Irrigate every 4-5 days due to high evaporation","🌿 Mulch around plants to retain moisture","⚠️ Protect plants from heat stress"]},Flowering:{Kharif:["⚠️ Avoid spraying pesticides during flowering","🌸 Ensure good drainage — waterlogging damages flowers","💧 Reduce irrigation frequency"],Rabi:["🌸 Critical stage — ensure adequate irrigation","⚠️ Protect from frost if temperature drops below 5°C","🐝 Avoid pesticides to protect pollinators"],Summer:["💧 Increase irrigation during flowering","⚠️ High temperature may cause flower drop","🌸 Apply potash fertilizer for better fruit set"]},Harvesting:{Kharif:["🌾 Harvest before heavy rain to avoid grain damage","☀️ Wait for 2-3 dry days before harvesting","🚜 Ensure threshing area is dry"],Rabi:["🌾 Ideal dry conditions for harvesting","☀️ Dry harvested grain in sunlight","🚜 Store in dry place to prevent moisture damage"],Summer:["🌾 Harvest early morning to avoid heat stress","💨 Use proper ventilation during storage","🚜 Complete harvest before monsoon arrives"]}};function getAdvisory(){var location=document.getElementById('location').value||'Karnataka';var season=document.getElementById('season').value;var crop=document.getElementById('crop').value;var stage=document.getElementById('stage').value;var w=weatherData[season];var forecast=w.forecast;var cropTips=tips[stage][season];var rainChance=parseInt(forecast[0].rain);var rainAlert=rainChance>60?'<div class="alert-high">🚨 High Rain Alert: '+rainChance+'% chance of rain tomorrow. Avoid spraying.</div>':'<div class="alert-low">✅ Low Rain Risk: Only '+rainChance+'% chance of rain tomorrow.</div>';var irrigation=season==='Kharif'?'💧 No irrigation needed for next 2-3 days due to expected rainfall.':(season==='Summer'?'💧 Irrigate today — next irrigation in 4-5 days.':'💧 Irrigate every 10-12 days. Next irrigation in 5 days.');var tableRows=forecast.map(function(f){return'<tr><td>'+f.day+'</td><td>'+f.condition+'</td><td>'+f.rain+'</td></tr>';}).join('');var tipsHtml=cropTips.map(function(t){return'<li>'+t+'</li>';}).join('');document.getElementById('result').innerHTML='<div class="section"><b>📍 '+location+'</b> | Season: '+season+' | Crop: '+crop+' ('+stage+')<br>🌡️ '+w.temp+' | 💧 '+w.humidity+' | 🌧️ '+w.rain+'</div><h3 style="color:#2d6a4f">📅 7-Day Forecast</h3><table><tr><th>Day</th><th>Condition</th><th>Rain Chance</th></tr>'+tableRows+'</table>'+rainAlert+'<div class="section"><b>💧 Irrigation Advice:</b><br>'+irrigation+'</div><div class="section"><b>🌾 Farming Advisory for '+crop+' ('+stage+'):</b><ul>'+tipsHtml+'</ul></div>';}</script></body></html>`;
+}
 
-On button click use hardcoded JS logic (NO fetch, NO API calls) to show:
-1. Weather Summary for that season and region
-2. 7-day forecast as a table (Day, Condition, Rain Chance %)
-3. Rain Alert (High/Medium/Low)
-4. Irrigation Advice (specific recommendation)
-5. Three farming tips based on crop stage and season
+function getSoilApp() {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Soil Health Analysis</title><style>body{font-family:Arial,sans-serif;background:#f0f7f0;margin:0;padding:20px}.container{max-width:480px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.1)}h2{color:#2d6a4f;text-align:center}label{display:block;font-weight:bold;color:#1b4332;margin-top:12px;margin-bottom:4px}input{width:100%;padding:10px;border:1px solid #b7e4c7;border-radius:8px;font-size:15px;box-sizing:border-box}button{width:100%;margin-top:16px;padding:12px;background:#2d6a4f;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer}button:hover{background:#1b4332}#result{margin-top:20px}.card{padding:12px;margin:8px 0;border-radius:8px}.good{background:#d8f3dc;border-left:4px solid #52b788}.warn{background:#fff3cd;border-left:4px solid #ffc107}.bad{background:#ffd6d6;border-left:4px solid #e63946}.score{font-size:2.5em;font-weight:bold;text-align:center;padding:16px}</style></head><body><div class="container"><h2>🧪 Soil Health Analysis</h2><label>pH Level (0–14)</label><input type="number" id="ph" placeholder="e.g. 6.5" step="0.1" min="0" max="14"><label>Organic Matter (%)</label><input type="number" id="organic" placeholder="e.g. 3.5" step="0.1"><label>Moisture Level (%)</label><input type="number" id="moisture" placeholder="e.g. 40"><button onclick="analyzeSoil()">Analyze Soil</button><div id="result"></div></div><script>function analyzeSoil(){var ph=parseFloat(document.getElementById('ph').value);var organic=parseFloat(document.getElementById('organic').value);var moisture=parseFloat(document.getElementById('moisture').value);if(isNaN(ph)||isNaN(organic)||isNaN(moisture)){document.getElementById('result').innerHTML='<p style="color:red">Please enter all values!</p>';return;}var soilType,phClass,phScore;if(ph<5.5){soilType='Strongly Acidic';phClass='bad';phScore=30;}else if(ph<6.0){soilType='Moderately Acidic';phClass='warn';phScore=60;}else if(ph<=7.0){soilType='Neutral (Ideal)';phClass='good';phScore=100;}else if(ph<=7.5){soilType='Slightly Alkaline';phClass='warn';phScore=70;}else{soilType='Strongly Alkaline';phClass='bad';phScore=30;}var omStatus,omClass,omScore;if(organic<1){omStatus='Very Low — Poor';omClass='bad';omScore=20;}else if(organic<2){omStatus='Low';omClass='warn';omScore=50;}else if(organic<=4){omStatus='Good';omClass='good';omScore=90;}else{omStatus='Excellent';omClass='good';omScore=100;}var moistStatus,moistClass,moistScore;if(moisture<20){moistStatus='Dry — Needs Irrigation';moistClass='bad';moistScore=30;}else if(moisture<=50){moistStatus='Optimal';moistClass='good';moistScore=100;}else if(moisture<=70){moistStatus='Slightly Waterlogged';moistClass='warn';moistScore=60;}else{moistStatus='Waterlogged — Needs Drainage';moistClass='bad';moistScore=20;}var total=Math.round((phScore+omScore+moistScore)/3);var scoreColor=total>=75?'#2d6a4f':total>=50?'#ffc107':'#e63946';var recs=[];if(ph<6.0)recs.push('🌿 Apply lime to raise pH — 2-3 tonnes/hectare');if(ph>7.5)recs.push('🌿 Apply gypsum or sulfur to lower pH');if(organic<2)recs.push('♻️ Add compost or farmyard manure — 5 tonnes/hectare annually');if(moisture<20)recs.push('💧 Irrigate immediately — soil is too dry');if(moisture>70)recs.push('🚰 Improve drainage — create furrows or raised beds');if(recs.length===0)recs.push('✅ Soil is in excellent condition!');document.getElementById('result').innerHTML='<div class="score" style="color:'+scoreColor+'">'+total+'/100<br><small style="font-size:0.4em;color:#555">Soil Health Score</small></div><div class="card '+phClass+'"><b>pH:</b> '+ph+' — '+soilType+'</div><div class="card '+omClass+'"><b>Organic Matter:</b> '+organic+'% — '+omStatus+'</div><div class="card '+moistClass+'"><b>Moisture:</b> '+moisture+'% — '+moistStatus+'</div><h3 style="color:#2d6a4f">📋 Recommendations:</h3>'+recs.map(function(r){return'<div class="card good">'+r+'</div>';}).join('');}</script></body></html>`;
+}
 
-Use realistic Indian seasonal data hardcoded in JS. Green theme. Output only raw HTML.`;
-  }
+function getFertilizerApp() {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Fertilizer Calculator</title><style>body{font-family:Arial,sans-serif;background:#f0f7f0;margin:0;padding:20px}.container{max-width:480px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.1)}h2{color:#2d6a4f;text-align:center}label{display:block;font-weight:bold;color:#1b4332;margin-top:12px;margin-bottom:4px}select,input{width:100%;padding:10px;border:1px solid #b7e4c7;border-radius:8px;font-size:15px;box-sizing:border-box}button{width:100%;margin-top:16px;padding:12px;background:#2d6a4f;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer}button:hover{background:#1b4332}#result{margin-top:20px}.card{background:#d8f3dc;padding:12px;margin:8px 0;border-radius:8px;border-left:4px solid #52b788}table{width:100%;border-collapse:collapse;margin-top:8px}th{background:#2d6a4f;color:white;padding:8px;text-align:left}td{padding:8px;border-bottom:1px solid #b7e4c7}</style></head><body><div class="container"><h2>🌱 Fertilizer Calculator</h2><label>Crop</label><select id="crop"><option value="Paddy">Paddy</option><option value="Wheat">Wheat</option><option value="Maize">Maize</option><option value="Cotton">Cotton</option><option value="Sugarcane">Sugarcane</option><option value="Groundnut">Groundnut</option><option value="Tomato">Tomato</option><option value="Onion">Onion</option></select><label>Land Size (acres)</label><input type="number" id="acres" placeholder="e.g. 2.5" step="0.5" min="0.5"><button onclick="calculate()">Calculate Fertilizer</button><div id="result"></div></div><script>var fertData={Paddy:{urea:130,dap:75,mop:50,cost:4200,schedule:'Apply DAP at sowing. Split urea in 3 doses: sowing, tillering, panicle initiation.'},Wheat:{urea:120,dap:60,mop:40,cost:3800,schedule:'Apply DAP + 1/3 urea at sowing. Remaining urea in 2 splits at 3 and 6 weeks.'},Maize:{urea:150,dap:75,mop:60,cost:4800,schedule:'Apply DAP at sowing. Urea in 3 equal splits at sowing, knee-high and tasselling.'},Cotton:{urea:100,dap:50,mop:50,cost:4000,schedule:'Apply DAP at sowing. Urea in 3 splits. Apply MOP at boll formation.'},Sugarcane:{urea:200,dap:85,mop:100,cost:7000,schedule:'Apply DAP at planting. Split urea in 4 doses over the growing season.'},Groundnut:{urea:30,dap:80,mop:40,cost:3200,schedule:'Apply all DAP and MOP at sowing. Minimal urea as groundnut fixes its own nitrogen.'},Tomato:{urea:120,dap:90,mop:80,cost:5500,schedule:'Apply DAP at transplanting. Urea in 4 splits. MOP at flowering and fruiting.'},Onion:{urea:100,dap:60,mop:60,cost:4200,schedule:'Apply DAP at sowing. Split urea in 3 doses. Apply MOP 30 days after transplanting.'}};function calculate(){var crop=document.getElementById('crop').value;var acres=parseFloat(document.getElementById('acres').value);if(!acres||acres<=0){document.getElementById('result').innerHTML='<p style="color:red">Please enter valid land size!</p>';return;}var d=fertData[crop];var urea=(d.urea*acres).toFixed(1);var dap=(d.dap*acres).toFixed(1);var mop=(d.mop*acres).toFixed(1);var cost=Math.round(d.cost*acres);document.getElementById('result').innerHTML='<h3 style="color:#2d6a4f">📊 Fertilizer for '+crop+' ('+acres+' acres)</h3><table><tr><th>Fertilizer</th><th>Quantity (kg)</th></tr><tr><td>🧪 Urea (46% N)</td><td>'+urea+' kg</td></tr><tr><td>🧪 DAP (18-46-0)</td><td>'+dap+' kg</td></tr><tr><td>🧪 MOP/Potash</td><td>'+mop+' kg</td></tr></table><div class="card"><b>💰 Estimated Cost:</b> ₹'+cost.toLocaleString('en-IN')+'</div><div class="card"><b>📅 Application Schedule:</b><br>'+d.schedule+'</div>';}</script></body></html>`;
+}
 
-  if (type === 'soil') {
-    return `Build a soil health analysis app for Indian farmers.
-Use these inputs:
-- pH Level (number, range 0-14)
-- Organic Matter Percentage (number)
-- Moisture Level percentage (number)
-
-On button click use hardcoded JS logic (NO fetch, NO API calls, NO XMLHttpRequest) to show:
-1. Soil Type (Acidic/Neutral/Alkaline based on pH)
-2. Soil Health Score out of 100
-3. Organic Matter Status (Poor/Good/Excellent)
-4. Moisture Status (Dry/Optimal/Waterlogged)
-5. Three specific recommendations to improve the soil
-
-IMPORTANT: Use only plain JavaScript if/else logic. No network calls of any kind.
-Green theme. Output only raw HTML with CSS in style tag and JS in script tag.`;
-  }
-
-  if (type === 'fertilizer') {
-    return `Build a fertilizer recommendation app for Indian farmers.
-Use these inputs:
-- Crop (dropdown: Paddy, Wheat, Maize, Cotton, Sugarcane, Groundnut, Tomato, Onion)
-- Land Size in acres (number)
-
-On button click use hardcoded JS logic (NO fetch, NO API calls) to show:
-1. Urea needed in kg
-2. DAP needed in kg
-3. Potash (MOP) needed in kg
-4. Application schedule (when to apply each)
-5. Estimated cost in rupees
-
-Use realistic ICAR recommended quantities. Green theme. Output only raw HTML.`;
-  }
-
-  if (type === 'irrigation') {
-    return `Build an irrigation scheduling app for Indian farmers.
-Use these inputs:
-- Crop Type (dropdown: Paddy, Wheat, Maize, Cotton, Sugarcane, Vegetables)
-- Land Size in acres (number)
-- Last Rainfall in mm (number)
-- Soil Type (dropdown: Sandy, Loamy, Clay)
-
-On button click use hardcoded JS logic (NO fetch, NO API calls) to show:
-1. Water needed in litres
-2. Irrigation frequency (every X days)
-3. Best time to irrigate
-4. Next irrigation date
-5. Water saving tips
-
-Green theme. Output only raw HTML with CSS in style tag and JS in script tag.`;
-  }
-
-  return `Build an agricultural web app for Indian farmers based on this request: ${prompt}
-Use appropriate inputs, hardcoded JS logic, green theme.
-Output only raw HTML with CSS in style tag and JS in script tag. No fetch or API calls.`;
+function getIrrigationApp() {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Irrigation Scheduler</title><style>body{font-family:Arial,sans-serif;background:#f0f7f0;margin:0;padding:20px}.container{max-width:480px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.1)}h2{color:#2d6a4f;text-align:center}label{display:block;font-weight:bold;color:#1b4332;margin-top:12px;margin-bottom:4px}select,input{width:100%;padding:10px;border:1px solid #b7e4c7;border-radius:8px;font-size:15px;box-sizing:border-box}button{width:100%;margin-top:16px;padding:12px;background:#2d6a4f;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer}button:hover{background:#1b4332}#result{margin-top:20px}.card{background:#d8f3dc;padding:12px;margin:8px 0;border-radius:8px;border-left:4px solid #52b788}.warn{background:#fff3cd;border-left:4px solid #ffc107}</style></head><body><div class="container"><h2>💧 Irrigation Scheduler</h2><label>Crop Type</label><select id="crop"><option value="Paddy">Paddy</option><option value="Wheat">Wheat</option><option value="Maize">Maize</option><option value="Cotton">Cotton</option><option value="Sugarcane">Sugarcane</option><option value="Vegetables">Vegetables</option></select><label>Land Size (acres)</label><input type="number" id="acres" placeholder="e.g. 2" step="0.5" min="0.5"><label>Last Rainfall (mm)</label><input type="number" id="rain" placeholder="e.g. 25" min="0"><label>Soil Type</label><select id="soil"><option value="Sandy">Sandy (drains fast)</option><option value="Loamy">Loamy (ideal)</option><option value="Clay">Clay (retains water)</option></select><button onclick="schedule()">Get Irrigation Schedule</button><div id="result"></div></div><script>var cropData={Paddy:{waterPerAcre:50000,baseFreq:3,tips:'Keep 5cm standing water during vegetative stage.'},Wheat:{waterPerAcre:8000,baseFreq:12,tips:'Critical stages: CRI, tillering, jointing, flowering, grain filling.'},Maize:{waterPerAcre:10000,baseFreq:8,tips:'Avoid waterlogging. Most critical during silking stage.'},Cotton:{waterPerAcre:9000,baseFreq:10,tips:'Reduce irrigation before picking. Avoid wetting bolls.'},Sugarcane:{waterPerAcre:40000,baseFreq:7,tips:'High water requirement. Drip irrigation saves 30-40% water.'},Vegetables:{waterPerAcre:6000,baseFreq:5,tips:'Frequent light irrigation is better than heavy irrigation.'}};var soilFactor={Sandy:0.7,Loamy:1.0,Clay:1.3};function schedule(){var crop=document.getElementById('crop').value;var acres=parseFloat(document.getElementById('acres').value);var rain=parseFloat(document.getElementById('rain').value)||0;var soil=document.getElementById('soil').value;if(!acres||acres<=0){document.getElementById('result').innerHTML='<p style="color:red">Please enter valid land size!</p>';return;}var d=cropData[crop];var sf=soilFactor[soil];var waterNeeded=Math.round(d.waterPerAcre*acres);var rainOffset=Math.round(rain*acres*400);var actualWater=Math.max(0,waterNeeded-rainOffset);var freq=Math.round(d.baseFreq*sf);var nextDate=new Date();nextDate.setDate(nextDate.getDate()+(rain>20?Math.round(freq*1.5):freq));var nextStr=nextDate.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});var rainMsg=rain>20?'<div class="card warn">⚠️ Recent rainfall ('+rain+'mm) — irrigation delayed by '+Math.round(freq*0.5)+' days.</div>':'';document.getElementById('result').innerHTML='<div class="card"><b>💧 Water Required:</b> '+actualWater.toLocaleString('en-IN')+' litres</div><div class="card"><b>📅 Frequency:</b> Every '+freq+' days for '+soil+' soil</div><div class="card"><b>🗓️ Next Irrigation:</b> '+nextStr+'</div><div class="card"><b>⏰ Best Time:</b> Early morning (6–8 AM) or evening (5–7 PM)</div>'+rainMsg+'<div class="card"><b>💡 Tips for '+crop+':</b><br>'+d.tips+'</div><div class="card"><b>🚿 Water Saving Tips:</b><br>• Use drip irrigation to save 40% water<br>• Mulch to reduce evaporation<br>• Irrigate in furrows, not on leaves</div>';}</script></body></html>`;
 }
 
 export async function POST(request) {
   try {
     const { prompt } = await request.json();
-
-    if (!prompt) {
-      return Response.json({ error: 'Prompt is required' }, { status: 400 });
-    }
+    if (!prompt) return Response.json({ error: 'Prompt is required' }, { status: 400 });
 
     const appType = detectAppType(prompt);
-    const appPrompt = getAppPrompt(appType, prompt);
+
+    if (appType === 'crop') return Response.json({ code: getCropApp(), appType });
+    if (appType === 'weather') return Response.json({ code: getWeatherApp(), appType });
+    if (appType === 'soil') return Response.json({ code: getSoilApp(), appType });
+    if (appType === 'fertilizer') return Response.json({ code: getFertilizerApp(), appType });
+    if (appType === 'irrigation') return Response.json({ code: getIrrigationApp(), appType });
 
     const completion = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: [
-        {
-          role: 'system',
-          content: `You are an expert web developer. Generate complete self-contained HTML files. Output ONLY raw HTML code, nothing else. No markdown, no backticks, no explanations. All CSS in style tag, all JS in script tag.`
-        },
-        {
-          role: 'user',
-          content: appPrompt
-        }
+        { role: 'system', content: 'You are an expert web developer. Generate a complete self-contained HTML file for Indian farmers. Output only raw HTML, no markdown, no backticks. All CSS in style tag, all JS in script tag. Green theme. Use only hardcoded JS logic, no fetch or API calls.' },
+        { role: 'user', content: `Build this agricultural app: ${prompt}` }
       ],
       max_tokens: 4096,
     });
 
-    const code = completion.choices[0].message.content;
-    return Response.json({ code, appType });
+    return Response.json({ code: completion.choices[0].message.content, appType });
 
   } catch (error) {
     console.error('Groq error:', error);
