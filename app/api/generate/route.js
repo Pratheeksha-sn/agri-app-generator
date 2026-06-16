@@ -15,22 +15,50 @@ export async function POST(request) {
       messages: [
         {
           role: 'system',
-          content: `You are an expert agricultural web app generator with deep knowledge of Indian agriculture.
-
-When generating a crop recommendation app:
-- Use YOUR OWN agricultural knowledge to determine which crops suit which NPK ranges
-- Do NOT use fixed hardcoded if-else — use a data array of crops with NPK ranges based on your knowledge
-- Show ALL matching crops, not just one
-- Show the ideal NPK range for each recommended crop
-- Show close matches too with a note to adjust values
-- Always show result in div with id="result"
-- Never use form submit — use onclick
-- Input field ids must be: nitrogen, phosphorus, potassium
-
-Generate a COMPLETE, SELF-CONTAINED HTML file.
-Output ONLY raw HTML. No explanation, no markdown, no backticks.
-Use clean green-themed mobile-friendly UI.
-The app must work fully in browser with no external calls.`
+          content: `You are an expert agricultural web app generator.
+Generate a COMPLETE, SELF-CONTAINED HTML file for the requested app.
+STRICT Rules:
+- Output ONLY raw HTML. No explanation, no markdown, no backticks.
+- Include ALL CSS in style tag and ALL JS in script tag.
+- Use clean green-themed mobile-friendly UI.
+- Never use form submit, use onclick for buttons.
+- Always include a div with id="result" for output.
+- For crop recommendation apps, generate input fields with ids: nitrogen, phosphorus, potassium.
+- The button must call this exact fetch on click:
+document.getElementById('result').innerHTML = '🔍 Analyzing your soil...';
+fetch('https://agri-app-generator.vercel.app/api/recommend', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    nitrogen: document.getElementById('nitrogen').value,
+    phosphorus: document.getElementById('phosphorus').value,
+    potassium: document.getElementById('potassium').value
+  })
+})
+.then(r => r.json())
+.then(data => {
+  let html = '<p><b>🌍 Soil Assessment:</b> ' + data.soil_assessment + '</p>';
+  html += '<h3 style="color:#2d6a4f">✅ Best Crops:</h3>';
+  data.best_matches.forEach(c => {
+    html += '<div style="background:#d8f3dc;padding:10px;margin:8px 0;border-radius:8px">';
+    html += '<b>' + c.crop + '</b> — ' + c.suitability + '<br>';
+    html += '<small>' + c.reason + '</small>';
+    html += '</div>';
+  });
+  if (data.close_matches && data.close_matches.length > 0) {
+    html += '<h3 style="color:#b5500f">⚠️ Close Matches:</h3>';
+    data.close_matches.forEach(c => {
+      html += '<div style="background:#fff3cd;padding:10px;margin:8px 0;border-radius:8px">';
+      html += '<b>' + c.crop + '</b> — ' + c.suitability + '<br>';
+      html += '<small>' + c.reason + '</small>';
+      html += '</div>';
+    });
+  }
+  document.getElementById('result').innerHTML = html;
+})
+.catch(e => {
+  document.getElementById('result').innerHTML = '<p style="color:red">Error: ' + e.message + '</p>';
+});`
         },
         {
           role: 'user',
