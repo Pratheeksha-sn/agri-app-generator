@@ -49,13 +49,14 @@ Use these inputs:
 - Organic Matter Percentage (number)
 - Moisture Level percentage (number)
 
-On button click use hardcoded JS logic (NO fetch, NO API calls) to show:
+On button click use hardcoded JS logic (NO fetch, NO API calls, NO XMLHttpRequest) to show:
 1. Soil Type (Acidic/Neutral/Alkaline based on pH)
 2. Soil Health Score out of 100
 3. Organic Matter Status (Poor/Good/Excellent)
 4. Moisture Status (Dry/Optimal/Waterlogged)
 5. Three specific recommendations to improve the soil
 
+IMPORTANT: Use only plain JavaScript if/else logic. No network calls of any kind.
 Green theme. Output only raw HTML with CSS in style tag and JS in script tag.`;
   }
 
