@@ -15,50 +15,7 @@ export async function POST(request) {
       messages: [
         {
           role: 'system',
-          content: `You are an expert agricultural web app generator.
-Generate a COMPLETE, SELF-CONTAINED HTML file for the requested app.
-STRICT Rules:
-- Output ONLY raw HTML. No explanation, no markdown, no backticks.
-- Include ALL CSS in style tag and ALL JS in script tag.
-- Use clean green-themed mobile-friendly UI.
-- Never use form submit, use onclick for buttons.
-- Always include a div with id="result" for output.
-- For crop recommendation apps, generate input fields with ids: nitrogen, phosphorus, potassium.
-- The button must call this exact fetch on click:
-document.getElementById('result').innerHTML = '🔍 Analyzing your soil...';
-fetch('https://agri-app-generator.vercel.app/api/recommend', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    nitrogen: document.getElementById('nitrogen').value,
-    phosphorus: document.getElementById('phosphorus').value,
-    potassium: document.getElementById('potassium').value
-  })
-})
-.then(r => r.json())
-.then(data => {
-  let html = '<p><b>🌍 Soil Assessment:</b> ' + data.soil_assessment + '</p>';
-  html += '<h3 style="color:#2d6a4f">✅ Best Crops:</h3>';
-  data.best_matches.forEach(c => {
-    html += '<div style="background:#d8f3dc;padding:10px;margin:8px 0;border-radius:8px">';
-    html += '<b>' + c.crop + '</b> — ' + c.suitability + '<br>';
-    html += '<small>' + c.reason + '</small>';
-    html += '</div>';
-  });
-  if (data.close_matches && data.close_matches.length > 0) {
-    html += '<h3 style="color:#b5500f">⚠️ Close Matches:</h3>';
-    data.close_matches.forEach(c => {
-      html += '<div style="background:#fff3cd;padding:10px;margin:8px 0;border-radius:8px">';
-      html += '<b>' + c.crop + '</b> — ' + c.suitability + '<br>';
-      html += '<small>' + c.reason + '</small>';
-      html += '</div>';
-    });
-  }
-  document.getElementById('result').innerHTML = html;
-})
-.catch(e => {
-  document.getElementById('result').innerHTML = '<p style="color:red">Error: ' + e.message + '</p>';
-});`
+          content: 'You are an expert agricultural web app generator. Generate a COMPLETE, SELF-CONTAINED HTML file. Output ONLY raw HTML, no explanation, no markdown, no backticks. Include all CSS in a style tag and all JS in a script tag. Use green theme. For crop recommendation apps: create three number inputs with ids nitrogen, phosphorus, potassium. Add a button with onclick that first sets document.getElementById("result").innerHTML to "Analyzing..." then uses XMLHttpRequest to POST to https://agri-app-generator.vercel.app/api/recommend with JSON body containing nitrogen phosphorus and potassium values from the inputs. On success parse the JSON response and display soil_assessment, then loop through best_matches and close_matches arrays showing crop name suitability and reason in colored divs. Show results in a div with id result. Use XMLHttpRequest not fetch to avoid any syntax issues.'
         },
         {
           role: 'user',
